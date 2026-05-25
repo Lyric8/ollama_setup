@@ -18,6 +18,18 @@ $checks += [pscustomobject]@{
     Result = [Environment]::GetEnvironmentVariable('OLLAMA_HOST', 'User')
 }
 $checks += [pscustomobject]@{
+    Check = 'User env OLLAMA_CONTEXT_LENGTH'
+    Result = [Environment]::GetEnvironmentVariable('OLLAMA_CONTEXT_LENGTH', 'User')
+}
+$checks += [pscustomobject]@{
+    Check = 'User env OLLAMA_KV_CACHE_TYPE'
+    Result = [Environment]::GetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', 'User')
+}
+$checks += [pscustomobject]@{
+    Check = 'User env OLLAMA_FLASH_ATTENTION'
+    Result = [Environment]::GetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', 'User')
+}
+$checks += [pscustomobject]@{
     Check = 'Local /api/tags'
     Result = ((Invoke-RestMethod -Uri "$localApiBase/api/tags" -Method GET).models | ForEach-Object { $_.name }) -join ', '
 }

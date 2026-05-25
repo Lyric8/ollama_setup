@@ -9,6 +9,7 @@ $env:OLLAMA_HOST = [Environment]::GetEnvironmentVariable('OLLAMA_HOST', 'User')
 $env:OLLAMA_CONTEXT_LENGTH = [Environment]::GetEnvironmentVariable('OLLAMA_CONTEXT_LENGTH', 'User')
 $env:OLLAMA_KEEP_ALIVE = [Environment]::GetEnvironmentVariable('OLLAMA_KEEP_ALIVE', 'User')
 $env:OLLAMA_NO_CLOUD = [Environment]::GetEnvironmentVariable('OLLAMA_NO_CLOUD', 'User')
+$env:OLLAMA_KV_CACHE_TYPE = [Environment]::GetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', 'User')
 $env:OLLAMA_FLASH_ATTENTION = [Environment]::GetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', 'User')
 
 Get-Process 'ollama app' -ErrorAction SilentlyContinue | Stop-Process -Force

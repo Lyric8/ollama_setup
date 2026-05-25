@@ -4,6 +4,7 @@ param(
     [int]$ContextLength = 4096,
     [string]$KeepAlive = '10m',
     [string]$NoCloud = '1',
+    [string]$KvCacheType = 'q8_0',
     [string]$FlashAttention = '0'
 )
 
@@ -16,6 +17,7 @@ New-Item -ItemType Directory -Force -Path $ModelPath | Out-Null
 [System.Environment]::SetEnvironmentVariable('OLLAMA_CONTEXT_LENGTH', "$ContextLength", 'User')
 [System.Environment]::SetEnvironmentVariable('OLLAMA_KEEP_ALIVE', $KeepAlive, 'User')
 [System.Environment]::SetEnvironmentVariable('OLLAMA_NO_CLOUD', $NoCloud, 'User')
+[System.Environment]::SetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', $KvCacheType, 'User')
 [System.Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', $FlashAttention, 'User')
 
 $env:OLLAMA_MODELS = $ModelPath
@@ -23,6 +25,7 @@ $env:OLLAMA_HOST = $ListenHost
 $env:OLLAMA_CONTEXT_LENGTH = "$ContextLength"
 $env:OLLAMA_KEEP_ALIVE = $KeepAlive
 $env:OLLAMA_NO_CLOUD = $NoCloud
+$env:OLLAMA_KV_CACHE_TYPE = $KvCacheType
 $env:OLLAMA_FLASH_ATTENTION = $FlashAttention
 
 [pscustomobject]@{
@@ -31,5 +34,6 @@ $env:OLLAMA_FLASH_ATTENTION = $FlashAttention
     OLLAMA_CONTEXT_LENGTH = $env:OLLAMA_CONTEXT_LENGTH
     OLLAMA_KEEP_ALIVE = $env:OLLAMA_KEEP_ALIVE
     OLLAMA_NO_CLOUD = $env:OLLAMA_NO_CLOUD
+    OLLAMA_KV_CACHE_TYPE = $env:OLLAMA_KV_CACHE_TYPE
     OLLAMA_FLASH_ATTENTION = $env:OLLAMA_FLASH_ATTENTION
 } | Format-List
