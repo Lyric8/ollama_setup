@@ -4,7 +4,7 @@ set -e
 
 MODELS_PATH="${1:-$HOME/OllamaModels}"
 LISTEN_HOST="${2:-0.0.0.0:11434}"
-CONTEXT_LENGTH="${3:-65536}"
+CONTEXT_LENGTH="${3:-4096}"
 KEEP_ALIVE="${4:-10m}"
 
 mkdir -p "$MODELS_PATH"
@@ -34,8 +34,6 @@ cat > "$PLIST" <<EOF
         <key>OLLAMA_KEEP_ALIVE</key>
         <string>${KEEP_ALIVE}</string>
         <key>OLLAMA_NO_CLOUD</key>
-        <string>1</string>
-        <key>OLLAMA_FLASH_ATTENTION</key>
         <string>1</string>
         <key>OLLAMA_KV_CACHE_TYPE</key>
         <string>q8_0</string>

@@ -1,10 +1,10 @@
 param(
     [string]$ModelPath = 'D:\OllamaModels',
     [string]$ListenHost = '0.0.0.0:11434',
-    [int]$ContextLength = 65536,
+    [int]$ContextLength = 4096,
     [string]$KeepAlive = '10m',
     [string]$NoCloud = '1',
-    [string]$FlashAttention = '1'
+    [string]$FlashAttention = '0'
 )
 
 $ErrorActionPreference = 'Stop'

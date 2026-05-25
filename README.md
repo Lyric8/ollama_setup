@@ -27,8 +27,13 @@ Default settings:
 
 - `OLLAMA_MODELS=D:\OllamaModels`
 - `OLLAMA_HOST=0.0.0.0:11434`
-- `OLLAMA_CONTEXT_LENGTH=65536`
+- `OLLAMA_CONTEXT_LENGTH=4096`
 - `OLLAMA_KEEP_ALIVE=10m`
+- `OLLAMA_KV_CACHE_TYPE=q8_0`
+
+Do not force `OLLAMA_FLASH_ATTENTION=1` when serving `mahonzhan/bge-code-v1`.
+With Ollama 0.20.5 this can make that embedding model return near-zero
+vectors. Leave Flash Attention unset unless you have verified your models.
 
 If the server is dedicated to Ollama and you want models to stay loaded, re-run setup with:
 
@@ -41,14 +46,28 @@ powershell -ExecutionPolicy Bypass -File .\scripts\1-setup-ollama-server.ps1 -Ke
 After setup, use Ollama normally:
 
 ```powershell
+ollama pull mahonzhan/bge-code-v1
+ollama pull bge-m3
+ollama pull gemma4:26b-fast
 ollama pull gemma4:e4b
 ollama pull gemma4:26b
 ```
 
+Current shared model set:
+
+| Model | Size | Purpose |
+| --- | ---: | --- |
+| `mahonzhan/bge-code-v1` | 3.1 GB | Code embedding and codebase search |
+| `bge-m3` | 1.2 GB | General multilingual embedding and RAG |
+| `gemma4:26b-fast` | 17 GB | Stronger generation model, faster 26B variant |
+| `gemma4:e4b` | 9.6 GB | Lighter generation model |
+| `gemma4:26b` | 17 GB | Stronger generation model |
+
 Recommended starting point on a strong workstation:
 
-- `gemma4:e4b` for lighter usage
-- `gemma4:26b` if the machine has enough GPU memory and you want a stronger coding model
+- Use `gemma4:e4b` for lighter usage.
+- Use `gemma4:26b-fast` or `gemma4:26b` when the machine has enough GPU memory.
+- Use `bge-m3` for general embeddings and `mahonzhan/bge-code-v1` for code embeddings.
 
 ## Client quick start
 

@@ -30,16 +30,22 @@ brew install ollama
 
 ## 二、拉取模型
 
-### 可用模型（Gemma 4）
+### 当前共享模型清单
 
 | 模型 | 大小 | 适用场景 |
 |------|------|----------|
+| `mahonzhan/bge-code-v1` | 3.1 GB | 代码 embedding、代码库检索、代码 RAG |
+| `bge-m3` | 1.2 GB | 通用/多语言 embedding、知识库 RAG |
+| `gemma4:26b-fast` | 17 GB | 更强的生成模型，26B 快速变体 |
 | `gemma4:e4b` | 9.6 GB | 轻量快速，简单问答、代码补全 |
 | `gemma4:26b` | 17 GB | 复杂推理、长上下文、高质量输出 |
 
 ### 拉取命令
 
 ```bash
+ollama pull mahonzhan/bge-code-v1
+ollama pull bge-m3
+ollama pull gemma4:26b-fast
 ollama pull gemma4:e4b
 ollama pull gemma4:26b
 ```
@@ -83,12 +89,10 @@ ollama list
         <key>OLLAMA_MODELS</key>
         <string>/Users/YOUR_USERNAME/OllamaModels</string>
         <key>OLLAMA_CONTEXT_LENGTH</key>
-        <string>65536</string>
+        <string>4096</string>
         <key>OLLAMA_KEEP_ALIVE</key>
         <string>10m</string>
         <key>OLLAMA_NO_CLOUD</key>
-        <string>1</string>
-        <key>OLLAMA_FLASH_ATTENTION</key>
         <string>1</string>
         <key>OLLAMA_KV_CACHE_TYPE</key>
         <string>q8_0</string>
@@ -114,11 +118,12 @@ ollama list
 | 参数 | 值 | 说明 |
 |------|----|------|
 | `OLLAMA_HOST` | `0.0.0.0:11434` | 监听所有网卡，允许局域网访问 |
-| `OLLAMA_CONTEXT_LENGTH` | `65536` | 最大上下文长度（token 数） |
+| `OLLAMA_CONTEXT_LENGTH` | `4096` | 默认上下文长度（token 数）。32GB 统一内存上更稳 |
 | `OLLAMA_KEEP_ALIVE` | `10m` | 模型无请求后 10 分钟自动卸载释放内存。设为 `-1` 永不卸载，但会阻止模型切换 |
-| `OLLAMA_FLASH_ATTENTION` | `1` | 开启 Flash Attention，降低显存占用、提升速度 |
 | `OLLAMA_KV_CACHE_TYPE` | `q8_0` | KV Cache 量化，节省约 50% 显存 |
 | `OLLAMA_NUM_PARALLEL` | `2` | 并发请求数（全局，对所有模型生效） |
+
+> 不要为 `mahonzhan/bge-code-v1` 强制开启 `OLLAMA_FLASH_ATTENTION=1`。在 Ollama 0.20.5 上，这会让该 embedding 模型通过 API 返回接近 0 的向量。保持 unset/关闭即可。
 
 ### 启动服务
 
@@ -241,12 +246,15 @@ Apple M1 Pro 32GB 的统一内存架构中，CPU 和 GPU 共享同一块内存�
 
 系统为 GPU 预留约 21.3GB 可用显存。
 
-| 模型 | 权重占用 | KV Cache（q8_0, ctx=65536） | 合计 | 并发 2 是否可行 |
-|------|---------|----------------------------|------|----------------|
-| `gemma4:e4b` | ~5 GB | ~4 GB × 2 | ~13 GB | ✅ 充裕 |
-| `gemma4:26b` | ~17 GB | ~4 GB | ~21 GB | ⚠️ 接近上限，建议并发 1 |
+| 模型 | 权重占用 | 说明 |
+|------|---------|------|
+| `mahonzhan/bge-code-v1` | 3.1 GB | 代码 embedding，API 正常输出 1536 维向量 |
+| `bge-m3` | 1.2 GB | 通用 embedding，API 正常输出 1024 维向量 |
+| `gemma4:e4b` | 9.6 GB | 轻量生成模型 |
+| `gemma4:26b-fast` | 17 GB | 26B 快速变体 |
+| `gemma4:26b` | 17 GB | 26B 标准变体 |
 
-> 两个模型不能同时加载，切换时会自动卸载另一个。
+> 大模型和 embedding 模型可以短暂同时加载，但 32GB 统一内存上不要让 26B 模型吃过长 context。默认 `4096` 更稳。
 
 ### 推理速度实测（M1 Pro 32GB，Ollama 0.20.5）
 
@@ -263,12 +271,12 @@ Apple M1 Pro 32GB 的统一内存架构中，CPU 和 GPU 共享同一块内存�
 - 26b 推理模式生成 token 数更多（含思考过程），总耗时约 2.5 分钟
 - 首 token 延迟均在 400ms 以内，模型已加载时响应很快
 
-> 实测环境：Apple M1 Pro，32GB 统一内存，Flash Attention 开启，KV Cache q8_0，context 65536。
+> 实测环境：Apple M1 Pro，32GB 统一内存，KV Cache q8_0，context 4096。Flash Attention 不强制开启，以兼容 `mahonzhan/bge-code-v1`。
 
 ### 优化建议
 
 - **轻量任务用 e4b**：速度快 3 倍，显存占用一半
-- **保持 Flash Attention 开启**：对 Apple Silicon 有明显加速
+- **不要强制开启 Flash Attention**：`mahonzhan/bge-code-v1` 在 Ollama 0.20.5 + Flash Attention 下会返回接近 0 的 embedding
 - **KV Cache 用 q8_0**：在精度损失极小的前提下节省约 50% 显存，可以跑更长上下文
 - **不要同时运行其他大内存应用**：统一内存被其他程序占用会影响推理速度
 
